@@ -18,6 +18,7 @@ import org.servo.servoview.Servo;
 public class CordovaServoView extends org.servo.servoview.ServoView implements CordovaWebViewEngine.EngineView {
     private ServoWebViewEngine parentEngine;
     private CordovaInterface cordova;
+    private ServoServer server;
 
     public CordovaServoView(Context context) {
         this(context, null);
@@ -30,6 +31,9 @@ public class CordovaServoView extends org.servo.servoview.ServoView implements C
     void init(ServoWebViewEngine parentEngine, CordovaInterface cordova) {
         this.cordova = cordova;
         this.parentEngine = parentEngine;
+        this.server = new ServoServer(cordova);
+
+        this.server.start();
         
         // Set up the Servo client to handle callbacks
         setClient(new Servo.Client() {
