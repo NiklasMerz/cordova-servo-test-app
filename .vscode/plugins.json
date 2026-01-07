@@ -1,1 +1,1 @@
-{"plugins":["cordova-plugin-servo-webview"]}
+{"plugins":["cordova-plugin-fingerprint-aio","cordova-plugin-servo-webview"]}

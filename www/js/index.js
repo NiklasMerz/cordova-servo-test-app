@@ -26,4 +26,22 @@ function onDeviceReady() {
 
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
+
+    setTimeout(() => {
+        document.getElementById('deviceready').innerText = location.origin + " " + navigator.userAgent;
+    }, 3000);
+
+
+
+    Fingerprint.show({
+        description: "Some biometric description"
+    }, successCallback, errorCallback);
+
+    function successCallback() {
+        alert("Authentication successful");
+    }
+
+    function errorCallback(error) {
+        alert("Authentication invalid " + error.message);
+    }
 }
