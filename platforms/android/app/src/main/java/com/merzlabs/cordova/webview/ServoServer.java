@@ -30,7 +30,7 @@ public class ServoServer {
         this.assetManager = cordova.getActivity().getAssets();
 
         // The HTTP server handles serving the local assets
-        server.get(".*", new HttpServerRequestCallback() {
+        server.get("^(?!/cordova-socket).*", new HttpServerRequestCallback() {
             @Override
             public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
                 String path = request.getPath();
@@ -73,10 +73,12 @@ public class ServoServer {
 
         // The websocket server is the current solution for getting a JS <-> native
         // bridge without customizing servo
-        server.websocket("/live", new AsyncHttpServer.WebSocketRequestCallback() {
+        server.websocket("/cordova-socket", new AsyncHttpServer.WebSocketRequestCallback() {
             @Override
             public void onConnected(final WebSocket webSocket, AsyncHttpServerRequest request) {
                 _sockets.add(webSocket);
+
+                LOG.d(TAG, "Websocket connected");
 
                 // Use this to clean up any references to your websocket
                 webSocket.setClosedCallback(new CompletedCallback() {
@@ -84,7 +86,7 @@ public class ServoServer {
                     public void onCompleted(Exception ex) {
                         try {
                             if (ex != null)
-                                LOG.e("WebSocket", "An error occurred", ex);
+                                LOG.e(TAG, "An error occurred", ex);
                         } finally {
                             _sockets.remove(webSocket);
                         }

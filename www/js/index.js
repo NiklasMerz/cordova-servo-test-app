@@ -29,6 +29,27 @@ function onDeviceReady() {
 
     setTimeout(() => {
         document.getElementById('deviceready').innerText = location.origin + " " + navigator.userAgent;
+    
+    
+        const ws = new WebSocket('ws://localhost:5000/cordova-socket');
+
+        ws.onopen = () => {
+            console.log('✅ Connected to WebSocket server');
+            ws.send('Hello Server');
+            console.log('📤 Sent: Hello Server');
+        };
+
+        ws.onmessage = (event) => {
+            console.log('📥 Received:', event.data);
+        };
+
+        ws.onerror = (error) => {
+            console.error('❌ WebSocket error:', error);
+        };
+
+        ws.onclose = (event) => {
+            console.log('🔌 Connection closed:', event.code, event.reason);
+        };
     }, 3000);
 
 
