@@ -27,18 +27,24 @@ public class ServoServer {
     List<WebSocket> _sockets = new ArrayList<WebSocket>();
 
     public ServoServer(CordovaInterface cordova) {
-        this.assetManager  = cordova.getActivity().getAssets();
+        this.assetManager = cordova.getActivity().getAssets();
 
         // The HTTP server handles serving the local assets
-        server.get("/", new HttpServerRequestCallback() {
+        server.get(".*", new HttpServerRequestCallback() {
             @Override
             public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
                 String path = request.getPath();
+
+                LOG.d(TAG, "The webview requests this path: " + path);
 
                 // Default index response
                 if (path.isEmpty() || path.equals("/")) {
                     path = "www/index.html";
                 } else if (!path.startsWith("www/")) {
+                    // remove leading slash if present
+                    if (path.startsWith("/")) {
+                        path = path.substring(1);
+                    }
                     path = "www/" + path;
                 }
 
@@ -57,22 +63,22 @@ public class ServoServer {
 
                     response.send(contentType, buffer);
                 } catch (IOException e) {
-                    LOG.e(TAG, "Error loading the asset",e);
+                    LOG.e(TAG, "Error loading the asset", e);
                     // TODO how to handle the error here properly?
                     response.send("Error on path: " + path);
                 }
 
-
             }
         });
 
-        // The websocket server is the current solution for getting a JS <-> native bridge without customizing servo
+        // The websocket server is the current solution for getting a JS <-> native
+        // bridge without customizing servo
         server.websocket("/live", new AsyncHttpServer.WebSocketRequestCallback() {
             @Override
             public void onConnected(final WebSocket webSocket, AsyncHttpServerRequest request) {
                 _sockets.add(webSocket);
 
-                //Use this to clean up any references to your websocket
+                // Use this to clean up any references to your websocket
                 webSocket.setClosedCallback(new CompletedCallback() {
                     @Override
                     public void onCompleted(Exception ex) {
@@ -101,7 +107,7 @@ public class ServoServer {
         try {
             LOG.d(TAG, "Starting asset & websocket server");
             server.listen(5000);
-        } catch (Exception e){
+        } catch (Exception e) {
             LOG.e(TAG, "Failed to Start server", e);
         }
     }

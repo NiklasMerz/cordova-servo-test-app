@@ -33,6 +33,9 @@ public class CordovaServoView extends org.servo.servoview.ServoView implements C
         this.parentEngine = parentEngine;
         this.server = new ServoServer(cordova);
 
+        // Enable debug for now
+        this.setServoArgs("[\"--devtools=6000\"]", "debug", true);
+
         this.server.start();
         
         // Set up the Servo client to handle callbacks
