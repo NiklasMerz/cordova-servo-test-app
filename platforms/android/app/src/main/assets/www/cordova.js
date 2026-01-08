@@ -958,34 +958,30 @@ var messagesFromNative = [];
 var isProcessing = false;
 var resolvedPromise = typeof Promise === 'undefined' ? null : Promise.resolve();
 var nextTick = resolvedPromise ? function (fn) { resolvedPromise.then(fn); } : function (fn) { setTimeout(fn); };
+const ws = new WebSocket('ws://localhost:5000/cordova-socket');
+
+ ws.onopen = () => {
+        console.log('✅ Connected to WebSocket server');
+ };
+
+  ws.onmessage = (event) => {
+     console.log('📥 Received:', event.data);
+ };
+
+ ws.onerror = (error) => {
+     console.error('❌ WebSocket error:', error);
+ };
+
+ ws.onclose = (event) => {
+     console.log('🔌 Connection closed:', event.code, event.reason);
+ };
 
 function androidExec (success, fail, service, action, args) {
     console.debug("Android EXEC", success, fail, service, action, args)
 
-    const execRequest= {success, fail, service, action, args};
-
-    const ws = new WebSocket('ws://localhost:5000/cordova-socket');
-
-    ws.onopen = () => {
-        console.log('✅ Connected to WebSocket server');
-        ws.send(JSON.stringify(execRequest));
-        console.log('📤 Sent:', execRequest);
-    };
-
-    ws.onmessage = (event) => {
-        console.log('📥 Received:', event.data);
-    };
-
-    ws.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
-    };
-
-    ws.onclose = (event) => {
-        console.log('🔌 Connection closed:', event.code, event.reason);
-    };
 
 
-    if (bridgeSecret < 0) {
+   if (bridgeSecret < 0) {
         // If we ever catch this firing, we'll need to queue up exec()s
         // and fire them once we get a secret. For now, I don't think
         // it's possible for exec() to be called since plugins are parsed but
@@ -1013,6 +1009,9 @@ function androidExec (success, fail, service, action, args) {
     if (success || fail) {
         cordova.callbacks[callbackId] = { success: success, fail: fail };
     }
+
+   var execRequest= {bridgeSecret, success, fail, service, action, args, argsJson, callbackId};
+   ws.send(JSON.stringify(execRequest));
 
     var msgs = nativeApiProvider.get().exec(bridgeSecret, service, action, callbackId, argsJson);
     // If argsJson was received by Java as null, try again with the PROMPT bridge mode.

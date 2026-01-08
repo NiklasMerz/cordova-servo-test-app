@@ -12,6 +12,8 @@ import android.content.res.AssetManager;
 import org.apache.cordova.CordovaBridge;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.LOG;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,12 +101,32 @@ public class ServoServer {
                 webSocket.setStringCallback(new WebSocket.StringCallback() {
                     @Override
                     public void onStringAvailable(String s) {
-                        // TODO bridge execute
 
                         if ("Hello Server".equals(s)){
                             webSocket.send("Welcome Client!");
                         } else {
-                            LOG.d(TAG, s);
+                            // Parse message into JSON and pass to bridge
+                            try {
+                                LOG.d(TAG, "Received call: " + s);
+                                JSONObject json = new JSONObject(s);
+                                String service = json.getString("service");
+                                String action = json.getString("action");
+                                String rawArgs = json.getJSONArray("args").toString();
+                                String callbackId = json.getString("callbackId");
+                                int bridgeSecret = json.getInt("bridgeSecret");
+
+                                // TODO figure out bridge secret
+
+                                //bridge.jsSetNativeToJsBridgeMode(0, 0);
+                                String ret = bridge.jsExec(-1, service, action, callbackId, rawArgs);
+                                LOG.d(TAG, "Return: " + ret);
+                                if (ret != null)
+                                    webSocket.send(ret);
+                            } catch (JSONException e) {
+                                LOG.e(TAG, "Error parsing JSON from websocket", e);
+                            } catch (IllegalAccessException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
 
                     }
