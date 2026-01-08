@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 
+import org.apache.cordova.CordovaBridge;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CordovaWebViewEngine;
@@ -28,10 +29,10 @@ public class CordovaServoView extends org.servo.servoview.ServoView implements C
         super(context, attrs);
     }
 
-    void init(ServoWebViewEngine parentEngine, CordovaInterface cordova) {
+    void init(ServoWebViewEngine parentEngine, CordovaInterface cordova, CordovaBridge bridge) {
         this.cordova = cordova;
         this.parentEngine = parentEngine;
-        this.server = new ServoServer(cordova);
+        this.server = new ServoServer(cordova, bridge);
 
         // Enable debug for now
         this.setServoArgs("[\"--devtools=6000\"]", "debug", true);

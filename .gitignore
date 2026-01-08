@@ -40,3 +40,4 @@ node_modules/
 !/platforms/android/app/src/main/java/**
 /platforms/android/CordovaLib/*
 /platforms/android/app/src/main/java/de
+!/platforms/android/app/src/main/assets/

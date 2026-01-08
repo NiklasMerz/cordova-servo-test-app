@@ -9,6 +9,7 @@ import com.koushikdutta.async.http.server.HttpServerRequestCallback;
 
 import android.content.res.AssetManager;
 
+import org.apache.cordova.CordovaBridge;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.LOG;
 
@@ -23,11 +24,13 @@ public class ServoServer {
     private static final String TAG = "ServoServer";
     private final AssetManager assetManager;
     AsyncHttpServer server = new AsyncHttpServer();
+    protected final CordovaBridge bridge;
 
     List<WebSocket> _sockets = new ArrayList<WebSocket>();
 
-    public ServoServer(CordovaInterface cordova) {
+    public ServoServer(CordovaInterface cordova, CordovaBridge bridge) {
         this.assetManager = cordova.getActivity().getAssets();
+        this.bridge = bridge;
 
         // The HTTP server handles serving the local assets
         server.get("^(?!/cordova-socket).*", new HttpServerRequestCallback() {
@@ -96,8 +99,14 @@ public class ServoServer {
                 webSocket.setStringCallback(new WebSocket.StringCallback() {
                     @Override
                     public void onStringAvailable(String s) {
-                        if ("Hello Server".equals(s))
+                        // TODO bridge execute
+
+                        if ("Hello Server".equals(s)){
                             webSocket.send("Welcome Client!");
+                        } else {
+                            LOG.d(TAG, s);
+                        }
+
                     }
                 });
 

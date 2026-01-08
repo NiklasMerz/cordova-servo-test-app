@@ -63,7 +63,7 @@ public class ServoWebViewEngine implements CordovaWebViewEngine {
         this.resourceApi = resourceApi;
         this.pluginManager = pluginManager;
         this.nativeToJsMessageQueue = nativeToJsMessageQueue;
-        servoView.init(this, cordova);
+        servoView.init(this, cordova, bridge);
     }
 
     @Override
