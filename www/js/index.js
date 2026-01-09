@@ -27,36 +27,44 @@ function onDeviceReady() {
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
 
-    setTimeout(() => {
-        document.getElementById('deviceready').innerText = location.origin + " " + navigator.userAgent;
-    
-    
-        const ws = new WebSocket('ws://localhost:5000/cordova-socket');
 
-        ws.onopen = () => {
-            console.log('✅ Connected to WebSocket server');
-            ws.send('Hello Server');
-            console.log('📤 Sent: Hello Server');
-        };
+    console.log(device.cordova);
+    console.log(device.model);
+    console.log(device.platform);
+    console.log(device.uuid);
+    console.log(device.version);
 
-        ws.onmessage = (event) => {
-            console.log('📥 Received:', event.data);
-        };
+    window.addEventListener("batterystatus", onBatteryStatus, false);
 
-        ws.onerror = (error) => {
-            console.error('❌ WebSocket error:', error);
-        };
-
-        ws.onclose = (event) => {
-            console.log('🔌 Connection closed:', event.code, event.reason);
-        };
-    }, 3000);
+    function onBatteryStatus(status) {
+        console.log("Level: " + status.level + " isPlugged: " + status.isPlugged);
+    }
 
 
+    // onSuccess Callback
+    // This method accepts a Position object, which contains the
+    // current GPS coordinates
+    //
+    var onSuccess = function (position) {
+        alert('Latitude: ' + position.coords.latitude + '\n' +
+            'Longitude: ' + position.coords.longitude + '\n' +
+            'Altitude: ' + position.coords.altitude + '\n' +
+            'Accuracy: ' + position.coords.accuracy + '\n' +
+            'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' +
+            'Heading: ' + position.coords.heading + '\n' +
+            'Speed: ' + position.coords.speed + '\n' +
+            'Timestamp: ' + position.timestamp + '\n');
+    };
 
-    Fingerprint.show({
-        description: "Some biometric description"
-    }, successCallback, errorCallback);
+    // onError Callback receives a PositionError object
+    //
+    function onError(error) {
+        alert('code: ' + error.code + '\n' +
+            'message: ' + error.message + '\n');
+    }
+
+    navigator.geolocation.getCurrentPosition(onSuccess, onError);
+
 
     function successCallback() {
         alert("Authentication successful");
@@ -65,4 +73,10 @@ function onDeviceReady() {
     function errorCallback(error) {
         alert("Authentication invalid " + error.message);
     }
+
+    /*
+    Fingerprint.show({
+        description: "Some biometric description"
+    }, successCallback, errorCallback);
+    */
 }
