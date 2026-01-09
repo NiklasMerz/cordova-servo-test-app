@@ -54,9 +54,17 @@ function onDeviceReady() {
 
 
 
+    console.log(device.cordova);
+    console.log(device.model);
+    console.log(device.platform);
+    console.log(device.uuid);
+    console.log(device.version);
+
+    /*
     Fingerprint.show({
         description: "Some biometric description"
     }, successCallback, errorCallback);
+    */
 
     function successCallback() {
         alert("Authentication successful");

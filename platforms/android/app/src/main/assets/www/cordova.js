@@ -961,23 +961,34 @@ var nextTick = resolvedPromise ? function (fn) { resolvedPromise.then(fn); } : f
 const ws = new WebSocket('ws://localhost:5000/cordova-socket');
 
  ws.onopen = () => {
-        console.log('✅ Connected to WebSocket server');
+        console.info('Connected to WebSocket server');
  };
 
   ws.onmessage = (event) => {
-     console.log('📥 Received:', event.data);
+    console.debug('Received websocket message:', event.data);
+    let message = event.data;
+
+    // TODO find out whats going on here
+    // Remove all charaters before the first F or S
+    const messageStartIndex = message.search(/[FS]/);
+    if (messageStartIndex !== -1) {
+        message = message.substring(messageStartIndex);
+    }
+    console.debug("Processing message from native:", message);
+
+    processMessage(message);
  };
 
  ws.onerror = (error) => {
-     console.error('❌ WebSocket error:', error);
+     console.error('WebSocket error:', error);
  };
 
  ws.onclose = (event) => {
-     console.log('🔌 Connection closed:', event.code, event.reason);
+     console.info('Connection closed:', event.code, event.reason);
  };
 
 function androidExec (success, fail, service, action, args) {
-    console.debug("Android EXEC", success, fail, service, action, args)
+    //console.debug("Android EXEC", success, fail, service, action, args)
 
 
 
@@ -1140,6 +1151,7 @@ function buildPayload (payload, message) {
 
 // Processes a single message, as encoded by NativeToJsMessageQueue.java.
 function processMessage (message) {
+    console.debug("Processing message from native:", message);
     var firstChar = message.charAt(0);
     if (firstChar === 'J') {
         // This is deprecated on the .java side. It doesn't work with CSP enabled.

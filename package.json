@@ -14,13 +14,15 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "cordova-android": "^14.0.1",
+    "cordova-plugin-device": "^3.0.0",
     "cordova-plugin-fingerprint-aio": "^6.0.1",
     "cordova-plugin-servo-webview": "file:../cordova-plugin-servo-webview"
   },
   "cordova": {
     "plugins": {
       "cordova-plugin-fingerprint-aio": {},
-      "cordova-plugin-servo-webview": {}
+      "cordova-plugin-servo-webview": {},
+      "cordova-plugin-device": {}
     },
     "platforms": [
       "android"

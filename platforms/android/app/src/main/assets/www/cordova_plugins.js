@@ -7,10 +7,19 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "clobbers": [
         "Fingerprint"
       ]
+    },
+    {
+      "id": "cordova-plugin-device.device",
+      "file": "plugins/cordova-plugin-device/www/device.js",
+      "pluginId": "cordova-plugin-device",
+      "clobbers": [
+        "device"
+      ]
     }
   ];
   module.exports.metadata = {
     "cordova-plugin-fingerprint-aio": "6.0.1",
-    "cordova-plugin-servo-webview": "5.0.0"
+    "cordova-plugin-servo-webview": "5.0.0",
+    "cordova-plugin-device": "3.0.0"
   };
 });
