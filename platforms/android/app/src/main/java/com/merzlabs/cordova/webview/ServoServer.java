@@ -118,7 +118,7 @@ public class ServoServer {
                                 // TODO figure out bridge secret
 
                                 //bridge.jsSetNativeToJsBridgeMode(0, 0);
-                                String ret = bridge.jsExec(-1, service, action, callbackId, rawArgs);
+                                String ret = bridge.jsExec(bridgeSecret, service, action, callbackId, rawArgs);
                                 LOG.d(TAG, "Return: " + ret);
                                 if (ret != null)
                                     webSocket.send(ret);

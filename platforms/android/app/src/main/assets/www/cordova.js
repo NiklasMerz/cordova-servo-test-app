@@ -958,41 +958,9 @@ var messagesFromNative = [];
 var isProcessing = false;
 var resolvedPromise = typeof Promise === 'undefined' ? null : Promise.resolve();
 var nextTick = resolvedPromise ? function (fn) { resolvedPromise.then(fn); } : function (fn) { setTimeout(fn); };
-const ws = new WebSocket('ws://localhost:5000/cordova-socket');
-
- ws.onopen = () => {
-        console.info('Connected to WebSocket server');
- };
-
-  ws.onmessage = (event) => {
-    console.debug('Received websocket message:', event.data);
-    let message = event.data;
-
-    // TODO find out whats going on here
-    // Remove all charaters before the first F or S
-    const messageStartIndex = message.search(/[FS]/);
-    if (messageStartIndex !== -1) {
-        message = message.substring(messageStartIndex);
-    }
-    console.debug("Processing message from native:", message);
-
-    processMessage(message);
- };
-
- ws.onerror = (error) => {
-     console.error('WebSocket error:', error);
- };
-
- ws.onclose = (event) => {
-     console.info('Connection closed:', event.code, event.reason);
- };
 
 function androidExec (success, fail, service, action, args) {
-    //console.debug("Android EXEC", success, fail, service, action, args)
-
-
-
-   if (bridgeSecret < 0) {
+    if (bridgeSecret < 0) {
         // If we ever catch this firing, we'll need to queue up exec()s
         // and fire them once we get a secret. For now, I don't think
         // it's possible for exec() to be called since plugins are parsed but
@@ -1021,9 +989,6 @@ function androidExec (success, fail, service, action, args) {
         cordova.callbacks[callbackId] = { success: success, fail: fail };
     }
 
-   var execRequest= {bridgeSecret, success, fail, service, action, args, argsJson, callbackId};
-   ws.send(JSON.stringify(execRequest));
-
     var msgs = nativeApiProvider.get().exec(bridgeSecret, service, action, callbackId, argsJson);
     // If argsJson was received by Java as null, try again with the PROMPT bridge mode.
     // This happens in rare circumstances, such as when certain Unicode characters are passed over the bridge on a Galaxy S2.  See CB-2666.
@@ -1034,7 +999,7 @@ function androidExec (success, fail, service, action, args) {
     } else if (msgs) {
         messagesFromNative.push(msgs);
         // Always process async to avoid exceptions messing up stack.
-        nextTick(processMessages);
+        //nextTick(processMessages);
     }
 }
 
@@ -1057,7 +1022,7 @@ function pollOnce (opt_fromOnlineEvent) {
     if (msgs) {
         messagesFromNative.push(msgs);
         // Process sync since we know we're already top-of-stack.
-        processMessages();
+        //processMessages();
     }
 }
 
@@ -1151,7 +1116,7 @@ function buildPayload (payload, message) {
 
 // Processes a single message, as encoded by NativeToJsMessageQueue.java.
 function processMessage (message) {
-    console.debug("Processing message from native:", message);
+    console.trace('processMessage: ' + message);
     var firstChar = message.charAt(0);
     if (firstChar === 'J') {
         // This is deprecated on the .java side. It doesn't work with CSP enabled.

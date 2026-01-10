@@ -37,13 +37,19 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "file": "plugins/cordova-plugin-geolocation/www/PositionError.js",
       "pluginId": "cordova-plugin-geolocation",
       "runs": true
+    },
+    {
+      "id": "cordova-plugin-servo-webview.ServoBridge",
+      "file": "plugins/cordova-plugin-servo-webview/www/servo-bridge.js",
+      "pluginId": "cordova-plugin-servo-webview",
+      "runs": true
     }
   ];
   module.exports.metadata = {
     "cordova-plugin-fingerprint-aio": "6.0.1",
-    "cordova-plugin-servo-webview": "5.0.0",
     "cordova-plugin-device": "3.0.0",
     "cordova-plugin-battery-status": "2.0.3",
-    "cordova-plugin-geolocation": "5.0.0"
+    "cordova-plugin-geolocation": "5.0.0",
+    "cordova-plugin-servo-webview": "5.0.0"
   };
 });

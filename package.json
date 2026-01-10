@@ -23,12 +23,12 @@
   "cordova": {
     "plugins": {
       "cordova-plugin-fingerprint-aio": {},
-      "cordova-plugin-servo-webview": {},
       "cordova-plugin-device": {},
       "cordova-plugin-battery-status": {},
       "cordova-plugin-geolocation": {
         "GPS_REQUIRED": "true"
-      }
+      },
+      "cordova-plugin-servo-webview": {}
     },
     "platforms": [
       "android"
