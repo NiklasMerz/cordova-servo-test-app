@@ -1116,7 +1116,6 @@ function buildPayload (payload, message) {
 
 // Processes a single message, as encoded by NativeToJsMessageQueue.java.
 function processMessage (message) {
-    console.debug('processMessage: ' + message);
     var firstChar = message.charAt(0);
     if (firstChar === 'J') {
         // This is deprecated on the .java side. It doesn't work with CSP enabled.

@@ -5,6 +5,7 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
     var ws = null;
     var isConnected = false;
     var sendQueue = [];  // Outgoing messages waiting for connection
+    var bridgeSecret = null;  // Store the actual bridge secret from native
 
     // Save original prompt function
     var originalPrompt = window.prompt;
@@ -15,13 +16,27 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
         ws.onopen = function () {
             console.info('[ServoWS] Connected to WebSocket server');
             isConnected = true;
-            flushSendQueue();
+            
+            // Init to get bridge secret from native
+            ws.send('gap_init:3');
         };
 
         ws.onmessage = function (event) {
             console.debug('[ServoWS] Received message:', event.data);
 
             let message = event.data;
+
+            if (message.indexOf('gap_init:') === 0) {
+                const actualSecret = message.substring('gap_init:'.length);
+                if (actualSecret) {
+                    bridgeSecret = actualSecret;
+                    console.log('[ServoWS] Stored bridge secret:', actualSecret);
+                } else {
+                    console.error('[ServoWS] Failed to get bridge secret from native');
+                }
+                flushSendQueue();
+                return;
+            }
 
             // TODO find out whats going on here
             // Remove all charaters before the first F or S
@@ -138,10 +153,9 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
             }
             // gap_init: prefix = initialize bridge
             else if (defaultValue.indexOf('gap_init:') === 0) {
-                console.log('[ServoWS] Bridge initialization');
-                // Return a fake bridge secret (not used with WebSocket)
-                // TODO make secret work
-                return '1';
+                console.log('[ServoWS] Bridge initialization', message, defaultValue);
+                ws.send(defaultValue);
+                return null;
             }
         }
 

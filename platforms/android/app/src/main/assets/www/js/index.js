@@ -75,7 +75,7 @@ function onDeviceReady() {
     }
 
     
-    Fingerprint.show({
+   /*  Fingerprint.show({
         description: "Some biometric description"
-    }, successCallback, errorCallback);
+    }, successCallback, errorCallback); */
 }
