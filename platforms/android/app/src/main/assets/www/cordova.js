@@ -999,7 +999,7 @@ function androidExec (success, fail, service, action, args) {
     } else if (msgs) {
         messagesFromNative.push(msgs);
         // Always process async to avoid exceptions messing up stack.
-        //nextTick(processMessages);
+        nextTick(processMessages);
     }
 }
 
@@ -1022,7 +1022,7 @@ function pollOnce (opt_fromOnlineEvent) {
     if (msgs) {
         messagesFromNative.push(msgs);
         // Process sync since we know we're already top-of-stack.
-        //processMessages();
+        processMessages();
     }
 }
 
@@ -1116,7 +1116,7 @@ function buildPayload (payload, message) {
 
 // Processes a single message, as encoded by NativeToJsMessageQueue.java.
 function processMessage (message) {
-    console.trace('processMessage: ' + message);
+    console.debug('processMessage: ' + message);
     var firstChar = message.charAt(0);
     if (firstChar === 'J') {
         // This is deprecated on the .java side. It doesn't work with CSP enabled.

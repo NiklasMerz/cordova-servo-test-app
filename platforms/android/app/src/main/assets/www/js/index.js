@@ -67,16 +67,15 @@ function onDeviceReady() {
 
 
     function successCallback() {
-        alert("Authentication successful");
+        console.log("Authentication successful");
     }
 
     function errorCallback(error) {
-        alert("Authentication invalid " + error.message);
+        console.log("Authentication invalid " + error.message);
     }
 
-    /*
+    
     Fingerprint.show({
         description: "Some biometric description"
     }, successCallback, errorCallback);
-    */
 }
