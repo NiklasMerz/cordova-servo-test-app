@@ -123,6 +123,11 @@ public class ServoServer {
                             String callbackId = json.getString("callbackId");
                             int bridgeSecret = json.getInt("bridgeSecret");
 
+                            if (bridgeSecret <= 0) {
+                                LOG.w(TAG, "Invalid bridge secret: " + bridgeSecret);
+                                return;
+                            }
+
                             String ret = bridge.jsExec(bridgeSecret, service, action, callbackId, rawArgs);
                             LOG.d(TAG, "Return: " + ret);
                             if (ret != null)
