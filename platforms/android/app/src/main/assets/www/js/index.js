@@ -27,12 +27,14 @@ function onDeviceReady() {
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
 
-
+    console.log("Device Info:");
     console.log(device.cordova);
     console.log(device.model);
     console.log(device.platform);
     console.log(device.uuid);
     console.log(device.version);
+    console.log("--------------");
+    console.log(navigator.camera);
 
     window.addEventListener("batterystatus", onBatteryStatus, false);
 
@@ -66,16 +68,38 @@ function onDeviceReady() {
     navigator.geolocation.getCurrentPosition(onSuccess, onError);
 
 
-    function successCallback() {
-        console.log("Authentication successful");
-    }
-
-    function errorCallback(error) {
-        console.log("Authentication invalid " + error.message);
-    }
-
     
-   /*  Fingerprint.show({
+}
+
+function successCallback() {
+    console.log("Authentication successful");
+}
+
+function errorCallback(error) {
+    console.log("Authentication invalid " + error.message);
+}
+
+function promptFingerprintAuth() {
+    Fingerprint.show({
         description: "Some biometric description"
-    }, successCallback, errorCallback); */
+    }, successCallback, errorCallback);
+}
+
+
+function capturePhoto() {
+    navigator.camera.getPicture(onSuccess, onFail, {
+        quality: 50,
+        destinationType: Camera.DestinationType.FILE_URI
+    });
+
+    function onSuccess(imageURI) {
+        window.resolveLocalFileSystemURL(imageURI, (entry) => {
+            let image = document.getElementById('myImage');
+            image.src = entry.toURL();
+        }, onError);
+    }
+
+    function onFail(message) {
+        alert('Failed because: ' + message);
+    }
 }
