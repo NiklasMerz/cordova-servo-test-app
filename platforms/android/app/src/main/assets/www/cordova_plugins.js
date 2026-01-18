@@ -39,12 +39,6 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "runs": true
     },
     {
-      "id": "cordova-plugin-servo-webview.ServoBridge",
-      "file": "plugins/cordova-plugin-servo-webview/www/servo-bridge.js",
-      "pluginId": "cordova-plugin-servo-webview",
-      "runs": true
-    },
-    {
       "id": "cordova-plugin-camera.Camera",
       "file": "plugins/cordova-plugin-camera/www/CameraConstants.js",
       "pluginId": "cordova-plugin-camera",
@@ -75,6 +69,12 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "clobbers": [
         "CameraPopoverHandle"
       ]
+    },
+    {
+      "id": "cordova-plugin-servo-webview.ServoBridge",
+      "file": "plugins/cordova-plugin-servo-webview/www/servo-bridge.js",
+      "pluginId": "cordova-plugin-servo-webview",
+      "runs": true
     }
   ];
   module.exports.metadata = {
@@ -82,7 +82,7 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     "cordova-plugin-device": "3.0.0",
     "cordova-plugin-battery-status": "2.0.3",
     "cordova-plugin-geolocation": "5.0.0",
-    "cordova-plugin-servo-webview": "5.0.0",
-    "cordova-plugin-camera": "8.0.0"
+    "cordova-plugin-camera": "8.0.0",
+    "cordova-plugin-servo-webview": "5.0.0"
   };
 });

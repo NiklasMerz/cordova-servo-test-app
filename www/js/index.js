@@ -85,21 +85,20 @@ function promptFingerprintAuth() {
     }, successCallback, errorCallback);
 }
 
+function onSuccess(imageURI) {
+    window.resolveLocalFileSystemURL(imageURI, (entry) => {
+        let image = document.getElementById('myImage');
+        image.src = entry.toURL();
+    }, onError);
+}
+
+function onFail(message) {
+    alert('Failed because: ' + message);
+}
 
 function capturePhoto() {
     navigator.camera.getPicture(onSuccess, onFail, {
         quality: 50,
         destinationType: Camera.DestinationType.FILE_URI
     });
-
-    function onSuccess(imageURI) {
-        window.resolveLocalFileSystemURL(imageURI, (entry) => {
-            let image = document.getElementById('myImage');
-            image.src = entry.toURL();
-        }, onError);
-    }
-
-    function onFail(message) {
-        alert('Failed because: ' + message);
-    }
 }

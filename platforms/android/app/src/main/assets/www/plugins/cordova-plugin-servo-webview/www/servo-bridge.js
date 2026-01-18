@@ -2,6 +2,7 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
 (function () {
     'use strict';
     var exec = require('cordova/exec');
+    var nativeApi = require('cordova/android/promptbasednativeapi');
 
     var ws = null;
     var isConnected = false;
@@ -41,7 +42,11 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
                     if (!isBridgeInitialized) {
                         console.log('[ServoWS] Initializing Cordova exec with bridge secret');
                         isBridgeInitialized = true;
+                        nativeApi.setNativeToJsBridgeMode(3, bridgeSecret);
                         exec.init();
+                        setTimeout(() => {
+                            nativeApi.setNativeToJsBridgeMode(0, bridgeSecret);
+                        }, 2000);
                     }
 
                     // The queued messages need the new bridge secret
@@ -166,13 +171,14 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
             }
             // gap_bridge_mode: prefix = set bridge mode
             else if (defaultValue.indexOf('gap_bridge_mode:') === 0) {
-                console.log('[ServoWS] Bridge mode set to:', message, defaultValue);
-                // Return null because we are polling only for the requests
+                console.info('[ServoWS] Bridge mode set to:', message, defaultValue);
+                // Do nothing, just acknowledge as it's set in the native js code
+                exec.setNativeToJsBridgeMode(0, bridgeSecret);
                 return null;
             }
             // gap_poll: prefix = retrieve messages
             else if (defaultValue.indexOf('gap_poll:') === 0) {
-                console.debug('[ServoWS] Polling for messages');
+                console.warn('[ServoWS] Polling for messages');
                 return null;
             }
             // gap_init: prefix = initialize bridge
