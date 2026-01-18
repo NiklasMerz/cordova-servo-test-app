@@ -7,6 +7,7 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
     var ws = null;
     var isConnected = false;
     var sendQueue = [];  // Outgoing messages waiting for connection
+    var recieveQueue = []; // Incoming messages waiting to be processed
     var bridgeSecret = null;  // Store the actual bridge secret from native
     var isBridgeInitialized = false;
 
@@ -42,11 +43,8 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
                     if (!isBridgeInitialized) {
                         console.log('[ServoWS] Initializing Cordova exec with bridge secret');
                         isBridgeInitialized = true;
-                        nativeApi.setNativeToJsBridgeMode(3, bridgeSecret);
                         exec.init();
-                        setTimeout(() => {
-                            nativeApi.setNativeToJsBridgeMode(0, bridgeSecret);
-                        }, 2000);
+                        nativeApi.setNativeToJsBridgeMode(0, 0);
                     }
 
                     // The queued messages need the new bridge secret
@@ -67,49 +65,8 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
                 return;
             }
 
-            // TODO find out whats going on here
-            // Remove all charaters before the first F or S
-            const messageStartIndex = message.search(/[FS]/);
-            if (messageStartIndex !== -1) {
-                message = message.substring(messageStartIndex);
-            }
-            console.debug('[ServoWS] Cleaned message:', message);
-
-            // Parse and directly invoke cordova callback
-            if (typeof cordova !== 'undefined' && cordova.callbackFromNative) {
-                try {
-                    // Parse message format: S01 callbackId payload
-                    var firstChar = message.charAt(0);
-                    if (firstChar === 'S' || firstChar === 'F') {
-                        var success = firstChar === 'S';
-                        var keepCallback = message.charAt(1) === '1';
-                        var spaceIdx = message.indexOf(' ', 2);
-                        var status = +message.slice(2, spaceIdx);
-                        var nextSpaceIdx = message.indexOf(' ', spaceIdx + 1);
-                        var callbackId = message.slice(spaceIdx + 1, nextSpaceIdx);
-                        var payloadMessage = message.slice(nextSpaceIdx + 1);
-
-                        // Parse payload (simplified - handles basic types)
-                        var payload = [JSON.parse(payloadMessage)];
-
-                        console.log('[ServoWS] Calling callback:', callbackId, success, status, payload);
-                        if (!callbackId) {
-                            throw new Error('Invalid callbackId');
-                        }
-                        if (isNaN(status)) {
-                            throw new Error('Invalid status code');
-                        }
-                        if (payloadMessage.length === 0) {
-                            throw new Error('Invalid payload');
-                        }
-                        cordova.callbackFromNative(callbackId, success, status, payload, keepCallback);
-                    }
-                } catch (e) {
-                    console.error('[ServoWS] Error parsing message:', e, message);
-                }
-            } else {
-                console.warn('[ServoWS] Cordova not initialized or callbackFromNative not available');
-            }
+            // Store incoming message for processing
+            recieveQueue.push(message);
         }
 
         ws.onerror = function (error) {
@@ -172,13 +129,16 @@ cordova.define("cordova-plugin-servo-webview.ServoBridge", function(require, exp
             // gap_bridge_mode: prefix = set bridge mode
             else if (defaultValue.indexOf('gap_bridge_mode:') === 0) {
                 console.info('[ServoWS] Bridge mode set to:', message, defaultValue);
-                // Do nothing, just acknowledge as it's set in the native js code
                 exec.setNativeToJsBridgeMode(0, bridgeSecret);
                 return null;
             }
             // gap_poll: prefix = retrieve messages
             else if (defaultValue.indexOf('gap_poll:') === 0) {
-                console.warn('[ServoWS] Polling for messages');
+                message = recieveQueue.shift();
+                if (message !== undefined) {
+                    console.debug('[ServoWS] Polling for messages', message);
+                    return message;
+                }
                 return null;
             }
             // gap_init: prefix = initialize bridge

@@ -366,7 +366,6 @@ module.exports = {
         return prompt(argsJson, 'gap:' + JSON.stringify([bridgeSecret, service, action, callbackId]));
     },
     setNativeToJsBridgeMode: function (bridgeSecret, value) {
-        console.debug('[PromptBasedNativeApi] setNativeToJsBridgeMode', bridgeSecret, value);
         prompt(value, 'gap_bridge_mode:' + bridgeSecret);
     },
     retrieveJsMessages: function (bridgeSecret, fromOnlineEvent) {
@@ -951,7 +950,7 @@ var nativeToJsModes = {
     EVAL_BRIDGE: 3
 };
 var jsToNativeBridgeMode; // Set lazily.
-var nativeToJsBridgeMode = nativeToJsModes.POLLING;
+var nativeToJsBridgeMode = nativeToJsModes.EVAL_BRIDGE;
 var pollEnabled = false;
 var bridgeSecret = -1;
 
@@ -1064,8 +1063,9 @@ androidExec.setJsToNativeBridgeMode = function (mode) {
 };
 
 androidExec.setNativeToJsBridgeMode = function (mode) {
-    console.debug('Setting Native->JS bridge mode to ', mode, nativeToJsBridgeMode);
-    
+    if (mode === nativeToJsBridgeMode) {
+        return;
+    }
     if (nativeToJsBridgeMode === nativeToJsModes.POLLING) {
         pollEnabled = false;
     }
@@ -1073,10 +1073,11 @@ androidExec.setNativeToJsBridgeMode = function (mode) {
     nativeToJsBridgeMode = mode;
     // Tell the native side to switch modes.
     // Otherwise, it will be set by androidExec.init()
+    if (bridgeSecret >= 0) {
+        nativeApiProvider.get().setNativeToJsBridgeMode(bridgeSecret, mode);
+    }
 
-
-    if (mode === 0) {
-        console.debug('Native->JS bridge mode: POLLING');
+    if (mode === nativeToJsModes.POLLING) {
         pollEnabled = true;
         setTimeout(pollingTimerFunc, 1);
     }
