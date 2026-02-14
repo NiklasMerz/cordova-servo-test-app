@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.inputmethod.InputMethodManager;
 
 import org.apache.cordova.CordovaBridge;
 import org.apache.cordova.CordovaInterface;
@@ -14,7 +15,8 @@ import org.apache.cordova.LOG;
 import org.servo.servoview.Servo;
 
 /**
- * Custom ServoView subclass that enables us to capture events needed for Cordova.
+ * Custom ServoView subclass that enables us to capture events needed for
+ * Cordova.
  */
 public class CordovaServoView extends org.servo.servoview.ServoView implements CordovaWebViewEngine.EngineView {
     private ServoWebViewEngine parentEngine;
@@ -38,7 +40,7 @@ public class CordovaServoView extends org.servo.servoview.ServoView implements C
         this.setServoArgs("[\"--devtools=6000\"]", "debug", true);
 
         this.server.start();
-        
+
         // Set up the Servo client to handle callbacks
         setClient(new Servo.Client() {
             @Override
@@ -92,12 +94,28 @@ public class CordovaServoView extends org.servo.servoview.ServoView implements C
 
             @Override
             public void onImeShow() {
-                // Handle IME show
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    CordovaServoView view = CordovaServoView.this;
+                    view.setFocusable(true);
+                    view.setFocusableInTouchMode(true);
+                    view.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) view.getContext()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                });
             }
 
             @Override
             public void onImeHide() {
-                // Handle IME hide
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    InputMethodManager imm = (InputMethodManager) CordovaServoView.this.getContext()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(CordovaServoView.this.getWindowToken(), 0);
+                    }
+                });
             }
 
             @Override
